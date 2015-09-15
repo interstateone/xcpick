@@ -8,54 +8,55 @@
 
 set -eo pipefail
 
-function current_xcode_path {
+current_xcode_path() {
     xcode-select -p | grep -o "[a-zA-z0-9\ \.\/]*.app"
 }
 
-function current_xcode {
+current_xcode() {
     current_xcode_path | grep -o "[a-zA-Z0-9\ \.]*.app"
 }
 
-function current_xcode_index {
-    CURRENT_XCODE=$(current_xcode) 
-    list_xcodes | grep -n "$CURRENT_XCODE" | cut -f1 -d:
+current_xcode_index() {
+    current_xcode=$(current_xcode) 
+    list_xcodes | grep -n "$current_xcode" | cut -f1 -d:
 }
 
-function list_xcodes {
+list_xcodes() {
     ls -1 /Applications | grep Xcode
 }
 
-function list_xcodes_with_current {
-    CURRENT_INDEX=$(current_xcode_index)
-    list_xcodes | awk -v i="$CURRENT_INDEX" '{ printf NR ") " $0} i == NR { printf "\033[1;31m" " [CURRENT]" "\033[0m " } { print "" }' 
+list_xcodes_with_current() {
+    current_index=$(current_xcode_index)
+    list_xcodes | awk -v i="$current_index" '{ printf NR ") " $0} i == NR { printf "\033[1;31m" " [CURRENT]" "\033[0m " } { print "" }' 
 }
 
-function toggle_xcode {
-    INDEX=$((current_xcode_index + 1))
-    XCODES_COUNT=$(list_xcodes | wc -l)
-    if [[ $INDEX -gt $XCODES_COUNT ]] 
+toggle_xcode() {
+    index=$((current_xcode_index + 1))
+    xcodes_count=$(list_xcodes | wc -l)
+    if [[ $index -gt $xcodes_count ]] 
     then
-        INDEX=1  
+        index=1  
     fi
 
-    select_xcode_at_index $INDEX
+    select_xcode_at_index $index
 }
 
-function select_xcode_at_path {
-    sudo xcode-select -s "$1"
+select_xcode_at_path() {
+    declare path="$1"
+    sudo xcode-select -s "$path"
 }
 
-function select_xcode_at_index {
-    INDEX=$1
-    XCODE=$(list_xcodes | tail -n+"$INDEX" | head -n1)
-    XCODE_PATH="/Applications/$(list_xcodes | grep "$XCODE")"
-    select_xcode_at_path "$XCODE_PATH"
+select_xcode_at_index() {
+    declare index="$1"
+    xcode=$(list_xcodes | tail -n+"$index" | head -n1)
+    xcode_path="/Applications/$(list_xcodes | grep "$xcode")"
+    select_xcode_at_path "$xcode_path"
 }
 
 function interactive_select_xcode {
     list_xcodes_with_current
-    read -r -p "Enter a number to select an Xcode: " INDEX
-    select_xcode_at_index "$INDEX"
+    read -r -p "Enter a number to select an Xcode: " index
+    select_xcode_at_index "$index"
 }
 
 case "$1" in
