@@ -33,8 +33,7 @@ list_xcodes_with_current() {
 toggle_xcode() {
     index=$((current_xcode_index + 1))
     xcodes_count=$(list_xcodes | wc -l)
-    if [[ $index -gt $xcodes_count ]] 
-    then
+    if [[ $index -gt $xcodes_count ]]; then
         index=1  
     fi
 
