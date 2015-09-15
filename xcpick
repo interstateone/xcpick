@@ -69,7 +69,7 @@ case "$1" in
         toggle_xcode
         list_xcodes_with_current
         ;;
-    pick)
+    pick|'')
         interactive_select_xcode
         list_xcodes_with_current
         ;;
@@ -77,15 +77,16 @@ case "$1" in
         select_xcode_at_path $2
         list_xcodes_with_current
         ;;
-    -h|--help|'')
+    -h|--help|help)
         echo -e "Usage: xcpick [COMMAND]\n"
+        echo -e "The default command is pick.\n"
         echo -e "Commands:"
-        echo -e "  print\t\tPrints the currently selected Xcode path."
-        echo -e "  list\t\tLists all Xcodes in /Applications."
-        echo -e "  toggle\tCycles through all Xcodes in /Applications."
-        echo -e "  pick\tLists all Xcodes and waits for a selection to be made."
-        echo -e "  set [PATH]\tSelect a Xcode at a path."
-        echo -e "  -h, --help\tShow this message."
+        echo -e "  print\t\t\tPrints the currently selected Xcode path."
+        echo -e "  list\t\t\tLists all Xcodes in /Applications."
+        echo -e "  toggle\t\tCycles through all Xcodes in /Applications."
+        echo -e "  pick\t\t\tLists all Xcodes and waits for a selection to be made."
+        echo -e "  set [PATH]\t\tSelect a Xcode at a path."
+        echo -e "  help, -h, --help\tShow this message."
         ;;
     *)
 esac

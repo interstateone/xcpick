@@ -14,7 +14,7 @@ ln -s $PWD/xcpick ~/bin/xcpick
 ## Usage
 
 ```
-❯ ./xcpick
+❯ xcpick -h
 Usage: xcpick [COMMAND]
 
 Commands:
