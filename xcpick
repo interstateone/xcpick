@@ -27,7 +27,7 @@ function list_xcodes {
 
 function list_xcodes_with_current {
     CURRENT_INDEX=$(current_xcode_index)
-    list_xcodes | awk -v i=$CURRENT_INDEX '{ printf NR ") " $0} i == NR { printf "\033[1;31m" " [CURRENT]" "\033[0m " } { print "" }' 
+    list_xcodes | awk -v i="$CURRENT_INDEX" '{ printf NR ") " $0} i == NR { printf "\033[1;31m" " [CURRENT]" "\033[0m " } { print "" }' 
 }
 
 function toggle_xcode {
@@ -47,15 +47,15 @@ function select_xcode_at_path {
 
 function select_xcode_at_index {
     INDEX=$1
-    XCODE=$(list_xcodes | tail -n+$INDEX | head -n1)
+    XCODE=$(list_xcodes | tail -n+"$INDEX" | head -n1)
     XCODE_PATH="/Applications/$(list_xcodes | grep "$XCODE")"
     select_xcode_at_path "$XCODE_PATH"
 }
 
 function interactive_select_xcode {
     list_xcodes_with_current
-    read -p "Enter a number to select an Xcode: " INDEX
-    select_xcode_at_index $INDEX
+    read -r -p "Enter a number to select an Xcode: " INDEX
+    select_xcode_at_index "$INDEX"
 }
 
 case "$1" in
