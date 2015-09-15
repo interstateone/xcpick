@@ -1,0 +1,94 @@
+#!/bin/bash
+#
+# Copyright 2015 Brandon Evans
+# 
+# Based on xode-toggle by Jonathan Wight
+# https://github.com/schwa/xcode-toggle
+#
+
+set -eo pipefail
+
+function current_xcode_path {
+    xcode-select -p | grep -o "[a-zA-z0-9\ \.\/]*.app"
+}
+
+function current_xcode {
+    current_xcode_path | grep -o "[a-zA-Z0-9\ \.]*.app"
+}
+
+function current_xcode_index {
+    CURRENT_XCODE=$(current_xcode) 
+    list_xcodes | grep -n "$CURRENT_XCODE" | cut -f1 -d:
+}
+
+function list_xcodes {
+    ls -1 /Applications | grep Xcode
+}
+
+function list_xcodes_with_current {
+    CURRENT_INDEX=$(current_xcode_index)
+    list_xcodes | awk -v i=$CURRENT_INDEX '{ printf NR ") " $0} i == NR { printf "\033[1;31m" " [CURRENT]" "\033[0m " } { print "" }' 
+}
+
+function toggle_xcode {
+    INDEX=$((current_xcode_index + 1))
+    XCODES_COUNT=$(list_xcodes | wc -l)
+    if [[ $INDEX -gt $XCODES_COUNT ]] 
+    then
+        INDEX=1  
+    fi
+
+    select_xcode_at_index $INDEX
+}
+
+function select_xcode_at_path {
+    sudo xcode-select -s "$1"
+}
+
+function select_xcode_at_index {
+    INDEX=$1
+    XCODE=$(list_xcodes | tail -n+$INDEX | head -n1)
+    XCODE_PATH="/Applications/$(list_xcodes | grep "$XCODE")"
+    select_xcode_at_path "$XCODE_PATH"
+}
+
+function interactive_select_xcode {
+    list_xcodes_with_current
+    read -p "Enter a number to select an Xcode: " INDEX
+    select_xcode_at_index $INDEX
+}
+
+case "$1" in
+    print)
+        current_xcode_path
+        ;;
+    list)
+        list_xcodes_with_current
+        ;;
+    toggle)
+        toggle_xcode
+        list_xcodes_with_current
+        ;;
+    pick)
+        interactive_select_xcode
+        list_xcodes_with_current
+        ;;
+    set)
+        select_xcode_at_path $2
+        list_xcodes_with_current
+        ;;
+    -h|--help|'')
+        echo -e "Usage: xcpick [COMMAND]\n"
+        echo -e "Commands:"
+        echo -e "  print\t\tPrints the currently selected Xcode path."
+        echo -e "  list\t\tLists all Xcodes in /Applications."
+        echo -e "  toggle\tCycles through all Xcodes in /Applications."
+        echo -e "  pick\tLists all Xcodes and waits for a selection to be made."
+        echo -e "  set [PATH]\tSelect a Xcode at a path."
+        echo -e "  -h, --help\tShow this message."
+        ;;
+    *)
+esac
+
+exit 0
+
