@@ -74,7 +74,7 @@ case "$1" in
         list_xcodes_with_current
         ;;
     set)
-        select_xcode_at_path $2
+        select_xcode_at_path "$2"
         list_xcodes_with_current
         ;;
     -h|--help|help)
