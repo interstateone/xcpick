@@ -14,15 +14,13 @@ ln -s $PWD/xcpick ~/bin/xcpick
 ## Usage
 
 ```
-❯ xcpick -h
-Usage: xcpick [COMMAND]
-
-Commands:
-  print       Prints the currently selected Xcode path.
-  list        Lists all Xcodes in /Applications.
-  toggle      Cycles through all Xcodes in /Applications.
-  pick        Lists all Xcodes and waits for a selection to be made.
-  set [PATH]  Select a Xcode at a path.
-  -h, --help  Show this message.
+❯ xcpick
+1) Xcode-9.4.1.app
+2) Xcode-10.1.app
+3) Xcode-10.app [CURRENT]
+Enter a number to select an Xcode: 2
+1) Xcode-9.4.1.app
+2) Xcode-10.1.app [CURRENT]
+3) Xcode-10.app
 ```
 

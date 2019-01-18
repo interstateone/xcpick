@@ -8,88 +8,25 @@
 
 set -eo pipefail
 
-current_xcode_path() {
-    xcode-select -p | grep -o "[a-zA-z0-9\ \.\/]*.app"
-}
-
-current_xcode() {
-    current_xcode_path | grep -o "[a-zA-Z0-9\ \.]*.app"
-}
-
-current_xcode_index() {
-    current_xcode=$(current_xcode) 
-    list_xcodes | grep -n "$current_xcode" | cut -f1 -d:
-}
+xcodes=`find /Applications -type d -maxdepth 1 -name Xcode\*.app -exec basename {} \;`
 
 list_xcodes() {
-    ls -1 /Applications | grep Xcode
-}
-
-list_xcodes_with_current() {
-    current_index=$(current_xcode_index)
-    list_xcodes | awk -v i="$current_index" '{ printf NR ") " $0} i == NR { printf "\033[1;31m" " [CURRENT]" "\033[0m " } { print "" }' 
-}
-
-toggle_xcode() {
-    index=$((current_xcode_index + 1))
-    xcodes_count=$(list_xcodes | wc -l)
-    if [[ $index -gt $xcodes_count ]]; then
-        index=1  
-    fi
-
-    select_xcode_at_index $index
-}
-
-select_xcode_at_path() {
-    declare path="$1"
-    sudo xcode-select -s "$path"
+    local current_xcode_path=`xcode-select -p | cut -d'/' -f-3`
+    local current_xcode=`echo "$current_xcode_path" | cut -d'/' -f3-`
+    local current_xcode_index=`echo "$xcodes" | grep -n "$current_xcode" | cut -f1 -d:`
+    echo "$xcodes" | awk -v i="$current_xcode_index" '{ printf NR ") " $0} i == NR { printf "\033[1;31m" " [CURRENT]" "\033[0m " } { print "" }' 
 }
 
 select_xcode_at_index() {
     declare index="$1"
-    xcode=$(list_xcodes | tail -n+"$index" | head -n1)
-    xcode_path="/Applications/$(list_xcodes | grep "$xcode")"
-    select_xcode_at_path "$xcode_path"
+    xcode=$(echo "$xcodes" | tail -n+"$index" | head -n1)
+    sudo xcode-select -s "/Applications/$xcode"
 }
 
-function interactive_select_xcode {
-    list_xcodes_with_current
-    read -r -p "Enter a number to select an Xcode: " index
-    select_xcode_at_index "$index"
-}
-
-case "$1" in
-    print)
-        current_xcode_path
-        ;;
-    list)
-        list_xcodes_with_current
-        ;;
-    toggle)
-        toggle_xcode
-        list_xcodes_with_current
-        ;;
-    pick|'')
-        interactive_select_xcode
-        list_xcodes_with_current
-        ;;
-    set)
-        select_xcode_at_path "$2"
-        list_xcodes_with_current
-        ;;
-    -h|--help|help)
-        echo -e "Usage: xcpick [COMMAND]\n"
-        echo -e "The default command is pick.\n"
-        echo -e "Commands:"
-        echo -e "  print\t\t\tPrints the currently selected Xcode path."
-        echo -e "  list\t\t\tLists all Xcodes in /Applications."
-        echo -e "  toggle\t\tCycles through all Xcodes in /Applications."
-        echo -e "  pick\t\t\tLists all Xcodes and waits for a selection to be made."
-        echo -e "  set [PATH]\t\tSelect a Xcode at a path."
-        echo -e "  help, -h, --help\tShow this message."
-        ;;
-    *)
-esac
+list_xcodes
+read -r -p "Enter a number to select an Xcode: " index
+select_xcode_at_index $index
+list_xcodes
 
 exit 0
 
