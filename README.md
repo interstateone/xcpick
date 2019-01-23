@@ -1,5 +1,9 @@
 # xcpick
 
+*Deprecated, this lives [here](https://github.com/interstateone/dotfiles/blob/master/osx/bin/xcpick) now.*
+
+---
+
 I made this, based on [xcode-toggle](https://github.com/schwa/xcode-toggle) by [@schwa](https://twitter.com/schwa), because I wanted to see if it could be done in Bash as a little learning exercise. Contributions welcome, but it's just a little thing I made for myself, so it should stay small. If you get something out if it, that's awesome too :smile:.
 
 ## Installation
